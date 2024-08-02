@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wms.mapper.RecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wms.entity.Record">
+        <id column="id" property="id" />
+        <result column="goods" property="goods" />
+        <result column="user_id" property="userId" />
+        <result column="admin_id" property="adminId" />
+        <result column="count" property="count" />
+        <result column="create_time" property="createTime" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+<!--    customSqlSegment自带where，sqlSegment不自带where-->
+    <select id="customPage"  resultType="com.wms.entity.RecordRes">
+        select r.*, g.name goodsName, s.name storageName, t.name goodsTypeName,
+               (select u.name from user u where u.id = r.user_id) applicant,
+               (select u.name from user u where u.id = r.admin_id) operator
+        from record r,
+             goods g,
+             `storage` s,
+             goodstype t
+        where r.goods = g.id AND g.storage = s.id AND g.goods_type = t.id
+        <if test="ew != null">
+            <if test="ew.nonEmptyOfWhere">
+                AND
+            </if>
+            ${ew.sqlSegment}
+        </if>
+    </select>
+</mapper>
